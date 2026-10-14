@@ -1,5 +1,6 @@
 #import <InAppUpdateSpec/InAppUpdateSpec.h>
 
-@interface InAppUpdate : NSObject <NativeInAppUpdateSpec>
+// Play in-app updates are Android-only; on iOS the module reports "unsupported".
+@interface InAppUpdate : NativeInAppUpdateSpecBase <NativeInAppUpdateSpec>
 
 @end
