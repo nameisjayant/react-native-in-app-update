@@ -75,6 +75,16 @@ To fix formatting errors, run the following:
 yarn lint --fix
 ```
 
+Remember to add tests for your change if possible. Run the unit tests by:
+
+```sh
+yarn test          # JS (Jest)
+yarn test:android  # Android (JUnit, needs JDK 21)
+yarn test:ios      # iOS (XCTest, needs macOS + Xcode)
+```
+
+Native logic that doesn't need React Native lives in `android/src/main/java/com/inappupdate/InAppUpdateMapping.kt` and `ios/InAppUpdateInfo.m` so it can be unit tested; keep it that way when adding native code.
+
 
 
 ### Scripts

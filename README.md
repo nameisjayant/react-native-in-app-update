@@ -327,7 +327,9 @@ The [`example/`](example) app shows the current status and version info, and has
 | --- | --- |
 | `yarn` | Install dependencies (Yarn 4, Node version from `.nvmrc`) |
 | `yarn example android` / `yarn example ios` | Run the example app |
-| `yarn test` | Unit tests (Jest) |
+| `yarn test` | JS unit tests (Jest): API and hook on Android, iOS and web |
+| `yarn test:android` | Android unit tests (JUnit): Play Core → JS mapping. Needs JDK 21 |
+| `yarn test:ios` | iOS unit tests (XCTest): App Store lookup, version compare, update info. macOS + Xcode |
 | `yarn typecheck` | TypeScript check |
 | `yarn lint` | ESLint + Prettier |
 | `yarn prepare` | Build `lib/` with react-native-builder-bob |
@@ -342,8 +344,13 @@ src/
   useInAppUpdate.ts      Mandatory/flexible update hook
   NativeInAppUpdate.ts   TurboModule spec
   types.ts               Public types
+  __tests__/             Jest tests, per platform
 android/                 Kotlin module (com.inappupdate), Google Play Core app-update
+  src/main/.../InAppUpdateMapping.kt  Play → JS mapping (pure, unit tested)
+  src/test/              JUnit tests
 ios/                     Objective-C++ module, App Store lookup + SKStoreProductViewController
+  InAppUpdateInfo.{h,m}  App Store lookup → JS mapping (Foundation only, unit tested)
+  Tests/                 XCTest tests (scripts/test-ios.sh)
 example/                 Example app using the library from source
 ```
 

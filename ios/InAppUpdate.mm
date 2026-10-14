@@ -1,32 +1,9 @@
 #import "InAppUpdate.h"
+#import "InAppUpdateInfo.h"
 #import <React/RCTUtils.h>
 #import <StoreKit/StoreKit.h>
 
 typedef void (^InAppUpdateLookupCompletion)(NSDictionary *_Nullable app, NSError *_Nullable error);
-
-// Compares dotted versions segment by segment, so "1.10" > "1.9" and "1.0" == "1.0.0".
-static NSComparisonResult InAppUpdateCompareVersions(NSString *a, NSString *b)
-{
-  NSArray<NSString *> *pa = [a componentsSeparatedByString:@"."];
-  NSArray<NSString *> *pb = [b componentsSeparatedByString:@"."];
-  NSUInteger count = MAX(pa.count, pb.count);
-  for (NSUInteger i = 0; i < count; i++) {
-    NSInteger x = i < pa.count ? pa[i].integerValue : 0;
-    NSInteger y = i < pb.count ? pb[i].integerValue : 0;
-    if (x != y) return x > y ? NSOrderedDescending : NSOrderedAscending;
-  }
-  return NSOrderedSame;
-}
-
-static NSString *InAppUpdateString(id value)
-{
-  return [value isKindOfClass:NSString.class] ? value : nil;
-}
-
-static NSError *InAppUpdateError(NSString *message)
-{
-  return [NSError errorWithDomain:@"InAppUpdate" code:1 userInfo:@{NSLocalizedDescriptionKey : message}];
-}
 
 // iOS has no in-app update API: we look the app up on the App Store, compare
 // versions, and show its App Store page in-app (SKStoreProductViewController).
@@ -106,17 +83,7 @@ static NSError *InAppUpdateError(NSString *message)
           country:(nullable NSString *)country
        completion:(InAppUpdateLookupCompletion)completion
 {
-  NSURLComponents *components = [NSURLComponents componentsWithString:@"https://itunes.apple.com/lookup"];
-  NSMutableArray<NSURLQueryItem *> *query = [NSMutableArray arrayWithObjects:
-      [NSURLQueryItem queryItemWithName:@"bundleId" value:bundleId],
-      // Apple's CDN caches lookups for hours; a unique parameter gets a fresh answer.
-      [NSURLQueryItem queryItemWithName:@"_"
-                                  value:[NSString stringWithFormat:@"%.0f", NSDate.date.timeIntervalSince1970]],
-      nil];
-  if (country) [query addObject:[NSURLQueryItem queryItemWithName:@"country" value:country.lowercaseString]];
-  components.queryItems = query;
-
-  NSURLRequest *request = [NSURLRequest requestWithURL:components.URL
+  NSURLRequest *request = [NSURLRequest requestWithURL:InAppUpdateLookupURL(bundleId, country, NSDate.date)
                                            cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
                                        timeoutInterval:15];
   [[NSURLSession.sharedSession
@@ -126,47 +93,16 @@ static NSError *InAppUpdateError(NSString *message)
             completion(nil, error ?: InAppUpdateError(@"Empty response from the App Store"));
             return;
           }
-          NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-          NSArray *results = [json isKindOfClass:NSDictionary.class] ? json[@"results"] : nil;
-          if (![results isKindOfClass:NSArray.class]) {
-            completion(nil, InAppUpdateError(@"Unexpected response from the App Store"));
-            return;
-          }
-          NSDictionary *app = results.firstObject;
-          completion([app isKindOfClass:NSDictionary.class] ? app : nil, nil);
+          NSError *parseError;
+          NSDictionary *app = InAppUpdateAppFromLookupData(data, &parseError);
+          completion(app, parseError);
         }] resume];
 }
 
 - (NSDictionary *)updateInfoForApp:(nullable NSDictionary *)app systemVersion:(NSString *)systemVersion
 {
-  NSString *current = InAppUpdateString(NSBundle.mainBundle.infoDictionary[@"CFBundleShortVersionString"]);
-  NSString *storeVersion = InAppUpdateString(app[@"version"]);
-  NSString *minimumOs = InAppUpdateString(app[@"minimumOsVersion"]);
-  // A newer version this device can't install isn't an update for it.
-  BOOL installable = !minimumOs || InAppUpdateCompareVersions(systemVersion, minimumOs) != NSOrderedAscending;
-  BOOL available = current && storeVersion && installable &&
-      InAppUpdateCompareVersions(storeVersion, current) == NSOrderedDescending;
-
-  NSInteger stalenessDays = -1;
-  NSString *releaseDate = InAppUpdateString(app[@"currentVersionReleaseDate"]);
-  if (available && releaseDate) {
-    NSDate *date = [[NSISO8601DateFormatter new] dateFromString:releaseDate];
-    if (date) stalenessDays = MAX(0, (NSInteger)floor(-date.timeIntervalSinceNow / 86400));
-  }
-
-  return @{
-    @"updateAvailability" : available ? @"available" : @"not_available",
-    @"installStatus" : @"unknown",
-    @"availableVersionCode" : @0,
-    @"availableVersion" : storeVersion ?: @"",
-    @"releaseNotes" : InAppUpdateString(app[@"releaseNotes"]) ?: @"",
-    @"isImmediateAllowed" : @(available),
-    @"isFlexibleAllowed" : @(available),
-    @"clientVersionStalenessDays" : @(stalenessDays),
-    @"updatePriority" : @0,
-    @"bytesDownloaded" : @0,
-    @"totalBytesToDownload" : @0,
-  };
+  return InAppUpdateInfoForApp(
+      app, NSBundle.mainBundle.infoDictionary[@"CFBundleShortVersionString"], systemVersion, NSDate.date);
 }
 
 #pragma mark - App Store page

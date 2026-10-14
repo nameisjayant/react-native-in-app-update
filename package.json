@@ -21,6 +21,8 @@
     "*.podspec",
     "react-native.config.js",
     "!ios/build",
+    "!ios/Tests",
+    "!android/src/test",
     "!android/build",
     "!android/gradle",
     "!android/gradlew",
@@ -37,7 +39,9 @@
     "prepare": "bob build",
     "typecheck": "tsc",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
-    "test": "jest"
+    "test": "jest",
+    "test:android": "cd example/android && ./gradlew :react-native-in-app-update:testDebugUnitTest",
+    "test:ios": "./scripts/test-ios.sh"
   },
   "keywords": [
     "react-native",
@@ -142,6 +146,10 @@
     "modulePathIgnorePatterns": [
       "<rootDir>/example/node_modules",
       "<rootDir>/lib/"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/__fixtures__/"
     ]
   }
 }
