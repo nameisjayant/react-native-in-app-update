@@ -2,7 +2,7 @@
   "compilerOptions": {
     "rootDir": ".",
     "paths": {
-      "react-native-in-app-update": [
+      "@nameisjayant/react-native-in-app-update": [
         "./src/index"
       ]
     },

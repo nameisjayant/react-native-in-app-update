@@ -1,7 +1,7 @@
 # react-native-in-app-update
 
-[![npm version](https://img.shields.io/npm/v/react-native-in-app-update.svg)](https://www.npmjs.com/package/react-native-in-app-update)
-[![license](https://img.shields.io/npm/l/react-native-in-app-update.svg)](LICENSE)
+[![npm version](https://img.shields.io/npm/v/@nameisjayant/react-native-in-app-update.svg)](https://www.npmjs.com/package/@nameisjayant/react-native-in-app-update)
+[![license](https://img.shields.io/npm/l/@nameisjayant/react-native-in-app-update.svg)](LICENSE)
 ![platform](https://img.shields.io/badge/platform-android-3ddc84.svg)
 
 **Keep every user on the latest version of your React Native app.**
@@ -50,9 +50,9 @@ A small, typed wrapper around the [Google Play In-App Updates API](https://devel
 ## Installation
 
 ```sh
-npm install react-native-in-app-update
+npm install @nameisjayant/react-native-in-app-update
 # or
-yarn add react-native-in-app-update
+yarn add @nameisjayant/react-native-in-app-update
 ```
 
 On iOS, install pods (the module is a no-op there, but it still has to be linked):
@@ -68,7 +68,7 @@ There are no extra Android setup steps. Autolinking adds the Play Core dependenc
 Call the hook once in your root component:
 
 ```tsx
-import { useInAppUpdate } from 'react-native-in-app-update';
+import { useInAppUpdate } from '@nameisjayant/react-native-in-app-update';
 
 export default function App() {
   useInAppUpdate({ enabled: !__DEV__ });
@@ -105,7 +105,7 @@ How it behaves on Android:
 Let users keep using the app while the update downloads, then ask them to restart:
 
 ```tsx
-import { useInAppUpdate } from 'react-native-in-app-update';
+import { useInAppUpdate } from '@nameisjayant/react-native-in-app-update';
 
 function UpdateBanner() {
   const { status, progress, completeUpdate } = useInAppUpdate({
@@ -140,7 +140,7 @@ import {
   startUpdate,
   completeUpdate,
   addInstallStateListener,
-} from 'react-native-in-app-update';
+} from '@nameisjayant/react-native-in-app-update';
 
 const info = await checkForUpdate();
 
@@ -244,7 +244,7 @@ type InstallStatus =
 All types are exported from the package:
 
 ```ts
-import type { UpdateInfo, UpdateStatus, UseInAppUpdateOptions } from 'react-native-in-app-update';
+import type { UpdateInfo, UpdateStatus, UseInAppUpdateOptions } from '@nameisjayant/react-native-in-app-update';
 ```
 
 ## Platform support

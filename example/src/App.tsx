@@ -7,7 +7,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import { useInAppUpdate } from 'react-native-in-app-update';
+import { useInAppUpdate } from '@nameisjayant/react-native-in-app-update';
 
 /**
  * Real-app usage is a single line in your root component:

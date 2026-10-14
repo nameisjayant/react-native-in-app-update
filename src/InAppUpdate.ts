@@ -26,7 +26,7 @@ export async function startUpdate(
   _type: UpdateType = 'immediate'
 ): Promise<UpdateFlowResult> {
   throw new Error(
-    "'react-native-in-app-update' is only supported on native platforms."
+    "'@nameisjayant/react-native-in-app-update' is only supported on native platforms."
   );
 }
 

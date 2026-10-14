@@ -1,5 +1,5 @@
 {
-  "name": "react-native-in-app-update",
+  "name": "@nameisjayant/react-native-in-app-update",
   "version": "0.1.0",
   "description": "In-app updates for React Native: Google Play in-app updates on Android and App Store version check on iOS",
   "main": "./lib/module/index.js",
@@ -60,7 +60,8 @@
   },
   "homepage": "https://github.com/nameisjayant/react-native-in-app-update#readme",
   "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
   },
   "devDependencies": {
     "@eslint/compat": "^2.1.0",
