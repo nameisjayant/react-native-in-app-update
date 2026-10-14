@@ -62,7 +62,7 @@
   "bugs": {
     "url": "https://github.com/nameisjayant/react-native-in-app-update/issues"
   },
-  "homepage": "https://github.com/nameisjayant/react-native-in-app-update#readme",
+  "homepage": "https://nameisjayant.github.io/react-native-in-app-update/",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
     "access": "public"

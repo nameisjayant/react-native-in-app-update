@@ -3,10 +3,14 @@
 [![npm version](https://img.shields.io/npm/v/@nameisjayant/react-native-in-app-update.svg)](https://www.npmjs.com/package/@nameisjayant/react-native-in-app-update)
 [![license](https://img.shields.io/npm/l/@nameisjayant/react-native-in-app-update.svg)](LICENSE)
 ![platform](https://img.shields.io/badge/platform-android%20%7C%20ios-3ddc84.svg)
+[![CI](https://github.com/nameisjayant/react-native-in-app-update/actions/workflows/ci.yml/badge.svg)](https://github.com/nameisjayant/react-native-in-app-update/actions/workflows/ci.yml)
+[![docs](https://img.shields.io/badge/docs-website-1f8a5b.svg)](https://nameisjayant.github.io/react-native-in-app-update/)
 
 **Keep every user on the latest version of your React Native app.**
 
 A small, typed wrapper around the [Google Play In-App Updates API](https://developer.android.com/guide/playcore/in-app-updates) (Play Core `app-update` 2.1.0) on Android, and an App Store version check on iOS. Add one hook to your root component and users are prompted to update whenever a newer version is available: with Play's full-screen update screen on Android, and with your app's App Store page, shown inside the app, on iOS.
+
+📖 **Documentation website:** https://nameisjayant.github.io/react-native-in-app-update/
 
 ---
 
@@ -26,6 +30,7 @@ A small, typed wrapper around the [Google Play In-App Updates API](https://devel
 - [Testing in-app updates](#testing-in-app-updates)
 - [Troubleshooting](#troubleshooting)
 - [Development](#development)
+- [CI/CD](#cicd)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -353,6 +358,32 @@ ios/                     Objective-C++ module, App Store lookup + SKStoreProduct
   Tests/                 XCTest tests (scripts/test-ios.sh)
 example/                 Example app using the library from source
 ```
+
+## CI/CD
+
+GitHub Actions workflows live in `.github/workflows/`:
+
+| Workflow | Trigger | What it does |
+| --- | --- | --- |
+| `ci.yml` | Push / PR to `main` | Lint + typecheck, JS tests, Android (JUnit) and iOS (XCTest) unit tests, library build, example app builds for Android and iOS |
+| `docs.yml` | Push to `main` touching `docs/**`, or manual run | Publishes `docs/` to the `gh-pages` branch, served at [nameisjayant.github.io/react-native-in-app-update](https://nameisjayant.github.io/react-native-in-app-update/) |
+| `release.yml` | Push of a `v*` tag | Checks the tag matches `package.json`, runs lint/typecheck/tests, builds, publishes to npm (with provenance) and creates a GitHub release |
+
+### Releasing a new version
+
+1. Add an npm **Automation** access token as the `NPM_TOKEN` repository secret (Settings → Secrets and variables → Actions). One-time setup.
+2. Bump the version and push the tag:
+
+   ```sh
+   npm version patch   # or minor / major — updates package.json and creates the vX.Y.Z tag
+   git push origin main --follow-tags
+   ```
+
+The release workflow does the rest.
+
+### Docs website
+
+The site is a single static page at `docs/index.html`. Edit it, push to `main`, and the docs workflow redeploys it.
 
 ## Contributing
 
