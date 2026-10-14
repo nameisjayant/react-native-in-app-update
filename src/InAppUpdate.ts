@@ -10,6 +10,8 @@ export const UNSUPPORTED_INFO: UpdateInfo = {
   updateAvailability: 'unsupported',
   installStatus: 'unknown',
   availableVersionCode: 0,
+  availableVersion: null,
+  releaseNotes: null,
   isImmediateAllowed: false,
   isFlexibleAllowed: false,
   clientVersionStalenessDays: null,

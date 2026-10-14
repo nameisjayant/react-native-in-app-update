@@ -10,9 +10,13 @@ export type NativeUpdateInfo = {
   /** See `InstallStatus` in types.ts */
   installStatus: string;
   availableVersionCode: number;
+  /** iOS only: App Store version string */
+  availableVersion?: string;
+  /** iOS only: App Store "What's New" text */
+  releaseNotes?: string;
   isImmediateAllowed: boolean;
   isFlexibleAllowed: boolean;
-  /** -1 when Play doesn't know yet */
+  /** -1 when unknown */
   clientVersionStalenessDays: number;
   updatePriority: number;
   bytesDownloaded: number;

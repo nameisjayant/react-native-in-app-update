@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {
   ActivityIndicator,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -15,9 +16,12 @@ import { useInAppUpdate } from '@nameisjayant/react-native-in-app-update';
  *   useInAppUpdate(); // mandatory: every user is forced onto the latest version
  *
  * This screen adds a mode switch and a status readout so you can watch the flow.
- * In-app updates only work when the app was installed from Google Play
- * (internal testing track or internal app sharing) — see README "Testing".
+ * On Android, updates only work when the app was installed from Google Play
+ * (internal testing track or internal app sharing). On iOS, the app's bundle
+ * ID must be live on the App Store with a higher version — see README "Testing".
  */
+const isIOS = Platform.OS === 'ios';
+
 export default function App() {
   const [mandatory, setMandatory] = useState(true);
   const { status, updateInfo, error, progress, checkNow, completeUpdate } =
@@ -35,15 +39,19 @@ export default function App() {
             onPress={() => setMandatory(true)}
           />
           <Segment
-            label="Flexible"
+            label={isIOS ? 'Optional' : 'Flexible'}
             active={!mandatory}
             onPress={() => setMandatory(false)}
           />
         </View>
         <Text style={styles.hint}>
-          {mandatory
-            ? 'Full-screen Play update on every open/resume. Backing out shows it again.'
-            : 'Downloads in the background; you choose when to restart.'}
+          {isIOS
+            ? mandatory
+              ? 'App Store page on every open/resume. Closing it shows it again.'
+              : 'App Store page once per open/resume; closing it lets the user continue.'
+            : mandatory
+              ? 'Full-screen Play update on every open/resume. Backing out shows it again.'
+              : 'Downloads in the background; you choose when to restart.'}
         </Text>
 
         <View style={styles.card}>
@@ -52,22 +60,36 @@ export default function App() {
             label="Availability"
             value={updateInfo?.updateAvailability ?? '—'}
           />
-          <Row
-            label="Available version code"
-            value={updateInfo ? String(updateInfo.availableVersionCode) : '—'}
-          />
-          <Row
-            label="Immediate / flexible allowed"
-            value={
-              updateInfo
-                ? `${updateInfo.isImmediateAllowed} / ${updateInfo.isFlexibleAllowed}`
-                : '—'
-            }
-          />
+          {isIOS ? (
+            <Row
+              label="App Store version"
+              value={updateInfo?.availableVersion ?? '—'}
+            />
+          ) : (
+            <>
+              <Row
+                label="Available version code"
+                value={
+                  updateInfo ? String(updateInfo.availableVersionCode) : '—'
+                }
+              />
+              <Row
+                label="Immediate / flexible allowed"
+                value={
+                  updateInfo
+                    ? `${updateInfo.isImmediateAllowed} / ${updateInfo.isFlexibleAllowed}`
+                    : '—'
+                }
+              />
+            </>
+          )}
           <Row
             label="Staleness (days)"
             value={String(updateInfo?.clientVersionStalenessDays ?? '—')}
           />
+          {updateInfo?.releaseNotes && (
+            <Text style={styles.hint}>{updateInfo.releaseNotes}</Text>
+          )}
           {status === 'downloading' && (
             <View style={styles.progressTrack}>
               <View

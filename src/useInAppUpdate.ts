@@ -12,9 +12,9 @@ export type UpdateStatus =
   | 'idle'
   | 'checking'
   | 'up_to_date'
-  /** The Play update UI is on screen. */
+  /** The Play update UI (Android) or App Store page (iOS) is on screen. */
   | 'prompting'
-  /** User dismissed the Play UI (re-prompted when `mandatory`). */
+  /** User dismissed the update UI (re-prompted when `mandatory`). */
   | 'canceled'
   | 'downloading'
   /** Flexible update ready — call `completeUpdate()`. */
@@ -25,18 +25,19 @@ export type UpdateStatus =
 
 export type UseInAppUpdateOptions = {
   /**
-   * Force every user onto the latest Play version. Uses the immediate
-   * (full-screen) flow, re-shows it if the user backs out, and installs
-   * flexible downloads as soon as they finish. Default `true`.
+   * Force every user onto the latest store version. On Android uses the
+   * immediate (full-screen) flow, re-shows it if the user backs out, and
+   * installs flexible downloads as soon as they finish. On iOS shows the App
+   * Store page and re-shows it until the user updates. Default `true`.
    */
   mandatory?: boolean;
-  /** Flow used when `mandatory` is false. Default `'flexible'`. */
+  /** Android flow used when `mandatory` is false. Default `'flexible'`. */
   type?: UpdateType;
   /** Check when the hook mounts (app open). Default `true`. */
   checkOnMount?: boolean;
   /** Check again whenever the app returns to the foreground. Default `true`. */
   checkOnResume?: boolean;
-  /** Turn the hook off, e.g. in dev builds not installed from Play. */
+  /** Turn the hook off, e.g. in dev builds not installed from the store. */
   enabled?: boolean;
   onError?: (error: Error) => void;
 };

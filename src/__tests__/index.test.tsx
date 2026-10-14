@@ -41,6 +41,7 @@ describe('checkForUpdate', () => {
     const result = await checkForUpdate();
     expect(result.clientVersionStalenessDays).toBeNull();
     expect(result.availableVersionCode).toBe(42);
+    expect(result.availableVersion).toBeNull();
   });
 });
 
@@ -132,8 +133,62 @@ describe('useInAppUpdate (mandatory, default)', () => {
 });
 
 describe('on iOS', () => {
-  it('reports unsupported without touching the native module', async () => {
+  const asIOS = async (fn: () => Promise<void>) => {
     Object.defineProperty(Platform, 'OS', { get: () => 'ios' });
+    try {
+      await fn();
+    } finally {
+      Object.defineProperty(Platform, 'OS', { get: () => 'android' });
+    }
+  };
+
+  it('returns the App Store version and release notes', () =>
+    asIOS(async () => {
+      native.checkForUpdate.mockResolvedValueOnce(
+        info({
+          availableVersionCode: 0,
+          availableVersion: '2.1.0',
+          releaseNotes: 'Bug fixes',
+          clientVersionStalenessDays: 3,
+        })
+      );
+      const result = await checkForUpdate();
+      expect(result.availableVersion).toBe('2.1.0');
+      expect(result.releaseNotes).toBe('Bug fixes');
+      expect(result.clientVersionStalenessDays).toBe(3);
+    }));
+
+  it('re-shows the App Store page until the user updates (mandatory)', () =>
+    asIOS(async () => {
+      native.checkForUpdate.mockResolvedValue(
+        info({ availableVersion: '2.0' })
+      );
+      native.startUpdate
+        .mockResolvedValueOnce('canceled')
+        .mockResolvedValueOnce('canceled')
+        .mockReturnValueOnce(new Promise(() => {})); // sheet still open
+      const { result } = await renderHook(() => useInAppUpdate());
+      await waitFor(() => expect(native.startUpdate).toHaveBeenCalledTimes(3));
+      expect(result.current.status).toBe('prompting');
+    }));
+
+  it('shows the App Store page once when not mandatory', () =>
+    asIOS(async () => {
+      native.checkForUpdate.mockResolvedValue(
+        info({ availableVersion: '2.0' })
+      );
+      native.startUpdate.mockResolvedValue('canceled');
+      const { result } = await renderHook(() =>
+        useInAppUpdate({ mandatory: false })
+      );
+      await waitFor(() => expect(result.current.status).toBe('canceled'));
+      expect(native.startUpdate).toHaveBeenCalledTimes(1);
+    }));
+});
+
+describe('on web-like platforms', () => {
+  it('reports unsupported without touching the native module', async () => {
+    Object.defineProperty(Platform, 'OS', { get: () => 'windows' });
     try {
       const { result } = await renderHook(() => useInAppUpdate());
       await waitFor(() => expect(result.current.status).toBe('unsupported'));
