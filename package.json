@@ -40,7 +40,7 @@
     "typecheck": "tsc",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "test": "jest",
-    "test:android": "cd example/android && ./gradlew :react-native-in-app-update:testDebugUnitTest",
+    "test:android": "cd example/android && ./gradlew :nameisjayant_react-native-in-app-update:testDebugUnitTest",
     "test:ios": "./scripts/test-ios.sh"
   },
   "keywords": [
