@@ -1,6 +1,28 @@
 pluginManagement { includeBuild("../node_modules/@react-native/gradle-plugin") }
 plugins { id("com.facebook.react.settings") }
-extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> ex.autolinkLibrariesFromCommand() }
+
+// Android Studio launched from the Dock gets a bare PATH, so resolve node explicitly
+// (nvm / Homebrew / system) and reuse it for autolinking and the RN Gradle plugin.
+def resolveNodeBinary = {
+  def candidates = []
+  def nvmDir = System.getenv('NVM_DIR') ?: "${System.getProperty('user.home')}/.nvm"
+  def nvmrc = new File(rootDir, '../../.nvmrc')
+  if (nvmrc.exists()) {
+    candidates << "${nvmDir}/versions/node/${nvmrc.text.trim()}/bin/node"
+  }
+  candidates += ['/opt/homebrew/bin/node', '/usr/local/bin/node']
+  def found = candidates.find { new File(it).canExecute() }
+  return found ?: 'node'
+}
+gradle.ext.nodeBinary = resolveNodeBinary()
+
+extensions.configure(com.facebook.react.ReactSettingsExtension){ ex ->
+  ex.autolinkLibrariesFromCommand([
+    gradle.ext.nodeBinary,
+    new File(rootDir, '../node_modules/@react-native-community/cli/build/bin.js').absolutePath,
+    'config'
+  ])
+}
 rootProject.name = 'inappupdate.example'
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')

@@ -36,12 +36,18 @@
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
     "prepare": "bob build",
     "typecheck": "tsc",
-    "lint": "eslint \"**/*.{js,ts,tsx}\""
+    "lint": "eslint \"**/*.{js,ts,tsx}\"",
+    "test": "jest"
   },
   "keywords": [
     "react-native",
     "ios",
-    "android"
+    "android",
+    "in-app-update",
+    "app-update",
+    "play-core",
+    "app-store",
+    "force-update"
   ],
   "repository": {
     "type": "git",
@@ -62,12 +68,15 @@
     "@eslint/js": "^9.39.5",
     "@react-native/babel-preset": "0.86.2",
     "@react-native/eslint-config": "0.86.2",
+    "@react-native/jest-preset": "0.86.2",
+    "@types/jest": "^30",
     "@types/react": "^19.2.0",
     "del-cli": "^7.0.0",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-ft-flow": "^3.0.11",
     "eslint-plugin-prettier": "^5.5.6",
+    "jest": "^30",
     "prettier": "^3.9.6",
     "react": "19.2.3",
     "react-native": "0.86.2",
@@ -120,8 +129,16 @@
     "type": "turbo-module",
     "languages": "kotlin-objc",
     "tools": [
-      "eslint"
+      "eslint",
+      "jest"
     ],
     "version": "0.63.1"
+  },
+  "jest": {
+    "preset": "@react-native/jest-preset",
+    "modulePathIgnorePatterns": [
+      "<rootDir>/example/node_modules",
+      "<rootDir>/lib/"
+    ]
   }
 }
